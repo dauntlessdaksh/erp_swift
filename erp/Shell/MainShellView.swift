@@ -2,24 +2,20 @@ import SwiftUI
 
 struct MainShellView: View {
     @State private var selectedTab = 0
+    @Environment(\.colorScheme) var colorScheme
     let loginResponse: LoginResponse
     let onLogout: () -> Void
     
     var body: some View {
         ZStack {
-            // Dark slate background matching splash & login
-            LinearGradient(
-                colors: [Color(red: 2/255, green: 6/255, blue: 23/255), Color(red: 15/255, green: 23/255, blue: 42/255)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
+            Color.appBackground
+                .ignoresSafeArea()
             
             // Subtle glowing circle for background visual depth
             VStack {
                 HStack {
                     Circle()
-                        .fill(Color(red: 99/255, green: 102/255, blue: 241/255).opacity(0.08))
+                        .fill(Color.appBlue.opacity(colorScheme == .dark ? 0.05 : 0.03))
                         .frame(width: 400, height: 400)
                         .blur(radius: 80)
                         .offset(x: -100, y: -100)
@@ -31,25 +27,25 @@ struct MainShellView: View {
             
             // Main views container
             VStack(spacing: 0) {
-                switch selectedTab {
-                case 0:
+                ZStack {
                     DashboardView(
-                        rollNumber: loginResponse.xUserId,
+                        rollNumber: KeychainHelper.shared.read(forKey: "stored_username") ?? loginResponse.xUserId,
                         firstName: "Student"
                     )
-                case 1:
+                    .opacity(selectedTab == 0 ? 1 : 0)
+                    .disabled(selectedTab != 0)
+                    
                     IdentityView()
-                case 2:
-                    AssignmentView()
-                case 3:
+                    .opacity(selectedTab == 1 ? 1 : 0)
+                    .disabled(selectedTab != 1)
+                    
                     TransportAttendanceView()
-                case 4:
+                    .opacity(selectedTab == 2 ? 1 : 0)
+                    .disabled(selectedTab != 2)
+                    
                     ProfileView(onLogout: onLogout)
-                default:
-                    DashboardView(
-                        rollNumber: loginResponse.xUserId,
-                        firstName: "Student"
-                    )
+                    .opacity(selectedTab == 3 ? 1 : 0)
+                    .disabled(selectedTab != 3)
                 }
             }
             
@@ -57,37 +53,32 @@ struct MainShellView: View {
             VStack {
                 Spacer()
                 
-                HStack(spacing: 20) {
-                    TabBarItem(iconName: "grid", isSelected: selectedTab == 0) {
+                HStack(spacing: 24) {
+                    TabBarItem(iconName: "house", isSelected: selectedTab == 0) {
                         selectedTab = 0
                     }
-                    TabBarItem(iconName: "cardtext", isSelected: selectedTab == 1) {
+                    TabBarItem(iconName: "person.crop.rectangle", isSelected: selectedTab == 1) {
                         selectedTab = 1
                     }
-                    TabBarItem(iconName: "doc.text", isSelected: selectedTab == 2) {
+                    TabBarItem(iconName: "cpu", isSelected: selectedTab == 2) {
                         selectedTab = 2
                     }
-                    TabBarItem(iconName: "cpu", isSelected: selectedTab == 3) {
+                    TabBarItem(iconName: "person", isSelected: selectedTab == 3) {
                         selectedTab = 3
-                    }
-                    TabBarItem(iconName: "person", isSelected: selectedTab == 4) {
-                        selectedTab = 4
                     }
                 }
                 .padding(.vertical, 12)
-                .padding(.horizontal, 16)
-                .background(
-                    Color.white.opacity(0.07)
-                        .blur(radius: 0.5)
-                )
+                .padding(.horizontal, 20)
+                .background(colorScheme == .light ? Color.white.opacity(0.85) : Color.cardBackground.opacity(0.85))
+                .background(.ultraThinMaterial)
                 .cornerRadius(32)
                 .overlay(
                     RoundedRectangle(cornerRadius: 32)
-                        .stroke(Color.white.opacity(0.12), lineWidth: 1.5)
+                        .stroke(Color.divider, lineWidth: 1.5)
                 )
                 .padding(.horizontal, 24)
                 .padding(.bottom, 20)
-                .shadow(color: Color.black.opacity(0.35), radius: 25, x: 0, y: 10)
+                .shadow(color: Color.shadow, radius: 16, x: 0, y: 6)
             }
             .ignoresSafeArea(.keyboard, edges: .bottom)
         }
@@ -98,18 +89,19 @@ struct TabBarItem: View {
     let iconName: String
     let isSelected: Bool
     let action: () -> Void
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         Button(action: action) {
             Image(systemName: isSelected ? "\(iconName).fill" : iconName)
                 .font(.system(size: 20))
-                .foregroundColor(isSelected ? .white : .white.opacity(0.35))
+                .foregroundColor(isSelected ? Color.accentGreen : Color.secondaryText)
                 .padding(12)
-                .background(isSelected ? Color.white.opacity(0.12) : Color.clear)
+                .background(isSelected ? (colorScheme == .light ? Color.secondaryCard : Color.cardBackground.opacity(0.5)) : Color.clear)
                 .cornerRadius(16)
                 .scaleEffect(isSelected ? 1.05 : 1.0)
-                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isSelected)
         }
+        .buttonStyle(TactileButtonStyle())
     }
 }
 
