@@ -1,6 +1,6 @@
 import Foundation
 
-struct UserProfile: Codable {
+struct UserProfile: Decodable {
     let fullName: String
     let firstName: String
     let contactNumber: String
@@ -14,47 +14,41 @@ struct UserProfile: Codable {
     let parentMobileNumber: String
     let collegeEmail: String
     
-    enum CodingKeys: String, CodingKey {
-        case firstName
-        case middleName
-        case lastName
-        case smsMobileNumber
-        case rollNumber
-        case semester
-        case sectionName
-        case dob
-        case address
-        case fatherName
-        case motherName
-        case parentMobileNumber
-        case email
+    // Dynamic coding keys to decode values from JSON
+    private struct DynamicCodingKeys: CodingKey {
+        var stringValue: String
+        init?(stringValue: String) {
+            self.stringValue = stringValue
+        }
+        var intValue: Int? { return nil }
+        init?(intValue: Int) { return nil }
     }
     
     init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
         
-        let fName = try container.decodeIfPresent(String.self, forKey: .firstName) ?? ""
-        let mName = try container.decodeIfPresent(String.self, forKey: .middleName) ?? ""
-        let lName = try container.decodeIfPresent(String.self, forKey: .lastName) ?? ""
+        let fName = try container.decodeIfPresent(String.self, forKey: DynamicCodingKeys(stringValue: "firstName")!) ?? ""
+        let mName = try container.decodeIfPresent(String.self, forKey: DynamicCodingKeys(stringValue: "middleName")!) ?? ""
+        let lName = try container.decodeIfPresent(String.self, forKey: DynamicCodingKeys(stringValue: "lastName")!) ?? ""
         
-        firstName = fName
-        fullName = [fName, mName, lName]
+        self.firstName = fName
+        self.fullName = [fName, mName, lName]
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
             .joined(separator: " ")
             
-        contactNumber = try container.decodeIfPresent(String.self, forKey: .smsMobileNumber) ?? ""
-        rollNumber = try container.decodeIfPresent(String.self, forKey: .rollNumber) ?? ""
-        semester = try container.decodeIfPresent(String.self, forKey: .semester) ?? ""
-        section = try container.decodeIfPresent(String.self, forKey: .sectionName) ?? ""
+        self.contactNumber = try container.decodeIfPresent(String.self, forKey: DynamicCodingKeys(stringValue: "smsMobileNumber")!) ?? ""
+        self.rollNumber = try container.decodeIfPresent(String.self, forKey: DynamicCodingKeys(stringValue: "rollNumber")!) ?? ""
+        self.semester = try container.decodeIfPresent(String.self, forKey: DynamicCodingKeys(stringValue: "semester")!) ?? ""
+        self.section = try container.decodeIfPresent(String.self, forKey: DynamicCodingKeys(stringValue: "sectionName")!) ?? ""
         
-        let rawDob = try container.decodeIfPresent(String.self, forKey: .dob) ?? ""
-        dob = rawDob.components(separatedBy: "T").first ?? ""
+        let rawDob = try container.decodeIfPresent(String.self, forKey: DynamicCodingKeys(stringValue: "dob")!) ?? ""
+        self.dob = rawDob.components(separatedBy: "T").first ?? ""
         
-        address = try container.decodeIfPresent(String.self, forKey: .address) ?? ""
-        fatherName = try container.decodeIfPresent(String.self, forKey: .fatherName) ?? ""
-        motherName = try container.decodeIfPresent(String.self, forKey: .motherName) ?? ""
-        parentMobileNumber = try container.decodeIfPresent(String.self, forKey: .parentMobileNumber) ?? ""
-        collegeEmail = try container.decodeIfPresent(String.self, forKey: .email) ?? ""
+        self.address = try container.decodeIfPresent(String.self, forKey: DynamicCodingKeys(stringValue: "address")!) ?? ""
+        self.fatherName = try container.decodeIfPresent(String.self, forKey: DynamicCodingKeys(stringValue: "fatherName")!) ?? ""
+        self.motherName = try container.decodeIfPresent(String.self, forKey: DynamicCodingKeys(stringValue: "motherName")!) ?? ""
+        self.parentMobileNumber = try container.decodeIfPresent(String.self, forKey: DynamicCodingKeys(stringValue: "parentMobileNumber")!) ?? ""
+        self.collegeEmail = try container.decodeIfPresent(String.self, forKey: DynamicCodingKeys(stringValue: "email")!) ?? ""
     }
 }

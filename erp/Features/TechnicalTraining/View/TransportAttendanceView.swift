@@ -70,7 +70,7 @@ struct TransportAttendanceView: View {
                                             Text("TOTAL ATTENDANCE")
                                                 .font(.system(size: 10, weight: .bold))
                                                 .foregroundColor(.white.opacity(0.4))
-                                                .letterSpacing(1)
+                                                .tracking(1)
                                         }
                                         Spacer()
                                         
@@ -96,13 +96,9 @@ struct TransportAttendanceView: View {
                                 // Logs List
                                 VStack(spacing: 10) {
                                     ForEach(list) { entry in
-                                        let formatter = DateFormatter()
-                                        formatter.dateFormat = "dd MMM yyyy"
-                                        let dateStr = formatter.string(from: entry.attendanceDate)
-                                        
                                         HStack {
                                             VStack(alignment: .leading, spacing: 4) {
-                                                Text(dateStr)
+                                                Text(formatDate(entry.attendanceDate))
                                                     .font(.system(size: 15, weight: .semibold))
                                                     .foregroundColor(.white)
                                                 if let remarks = entry.remarks, !remarks.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -144,6 +140,12 @@ struct TransportAttendanceView: View {
                 await viewModel.loadAttendance()
             }
         }
+    }
+    
+    private func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd MMM yyyy"
+        return formatter.string(from: date)
     }
 }
 

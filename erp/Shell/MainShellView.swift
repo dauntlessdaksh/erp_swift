@@ -11,7 +11,7 @@ struct MainShellView: View {
             LinearGradient(
                 colors: [Color(red: 2/255, green: 6/255, blue: 23/255), Color(red: 15/255, green: 23/255, blue: 42/255)],
                 startPoint: .topLeading,
-                endPoint: .bottomRight
+                endPoint: .bottomTrailing
             )
             .ignoresSafeArea()
             

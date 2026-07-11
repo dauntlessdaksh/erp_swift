@@ -3,7 +3,7 @@ import CoreImage.CIFilterBuiltins
 
 class BarcodeGenerator {
     static func generateBarcode(from string: String) -> UIImage? {
-        let data = string.data(using: .ascii)
+        guard let data = string.data(using: .ascii) else { return nil }
         let filter = CIFilter.code128BarcodeGenerator()
         filter.message = data
         

@@ -37,7 +37,7 @@ struct AssignmentView: View {
                 Text("UpMark ERP")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(.white.opacity(0.25))
-                    .letterSpacing(2)
+                    .tracking(2)
                     .textCase(.uppercase)
                     .padding(.bottom, 120)
             }

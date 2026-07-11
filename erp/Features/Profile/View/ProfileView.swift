@@ -148,7 +148,7 @@ struct InfoRowView: View {
             Text(label.uppercased())
                 .font(.system(size: 9, weight: .bold))
                 .foregroundColor(.white.opacity(0.4))
-                .letterSpacing(1.2)
+                .tracking(1.2)
             
             Text(value.isEmpty ? "-" : value)
                 .font(.system(size: 14, weight: .medium))

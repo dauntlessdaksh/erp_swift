@@ -17,7 +17,7 @@ struct ProgressRingView: View {
                     LinearGradient(
                         colors: [Color(red: 46/255, green: 158/255, blue: 91/255), Color(red: 76/255, green: 175/255, blue: 80/255)],
                         startPoint: .topLeading,
-                        endPoint: .bottomRight
+                        endPoint: .bottomTrailing
                     ),
                     style: StrokeStyle(lineWidth: 16, lineCap: .round, lineJoin: .round)
                 )

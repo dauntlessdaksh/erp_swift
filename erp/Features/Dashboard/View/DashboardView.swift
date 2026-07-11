@@ -12,7 +12,7 @@ struct DashboardView: View {
                     // Header Card
                     VStack(spacing: 16) {
                         HStack {
-                            VStack(cross: .leading, spacing: 4) {
+                            VStack(alignment: .leading, spacing: 4) {
                                 Text("Hello, \(firstName)")
                                     .font(.system(size: 24, weight: .bold, design: .rounded))
                                     .foregroundColor(.white)
@@ -167,7 +167,7 @@ struct SubjectAttendanceTile: View {
                         .frame(width: 4)
                         .frame(maxHeight: .infinity)
                     
-                    VStack(cross: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 8) {
                         Text(subjectName)
                             .font(.system(size: 15, weight: .bold))
                             .foregroundColor(.white)
@@ -175,11 +175,11 @@ struct SubjectAttendanceTile: View {
                             .lineLimit(2)
                         
                         HStack(spacing: 16) {
-                            VStack(cross: .leading, spacing: 2) {
+                            VStack(alignment: .leading, spacing: 2) {
                                 Text("ATTENDED")
                                     .font(.system(size: 9, weight: .bold))
                                     .foregroundColor(.white.opacity(0.4))
-                                    .letterSpacing(1)
+                                    .tracking(1)
                                 
                                 Text("\(present) / \(total)")
                                     .font(.system(size: 15, weight: .semibold))

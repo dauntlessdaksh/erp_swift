@@ -10,7 +10,7 @@ struct SplashView: View {
             LinearGradient(
                 colors: [Color(red: 2/255, green: 6/255, blue: 23/255), Color(red: 15/255, green: 23/255, blue: 42/255)],
                 startPoint: .topLeading,
-                endPoint: .bottomRight
+                endPoint: .bottomTrailing
             )
             .ignoresSafeArea()
             
@@ -58,7 +58,7 @@ struct SplashView: View {
                             LinearGradient(
                                 colors: [Color(red: 99/255, green: 102/255, blue: 241/255), Color(red: 79/255, green: 70/255, blue: 229/255)],
                                 startPoint: .topLeading,
-                                endPoint: .bottomRight
+                                endPoint: .bottomTrailing
                             )
                         )
                         .shadow(color: Color(red: 99/255, green: 102/255, blue: 241/255).opacity(0.5), radius: 15)

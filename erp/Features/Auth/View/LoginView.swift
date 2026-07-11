@@ -14,7 +14,7 @@ struct LoginView: View {
             LinearGradient(
                 colors: [Color(red: 2/255, green: 6/255, blue: 23/255), Color(red: 15/255, green: 23/255, blue: 42/255)],
                 startPoint: .topLeading,
-                endPoint: .bottomRight
+                endPoint: .bottomTrailing
             )
             .ignoresSafeArea()
             
@@ -131,7 +131,7 @@ struct LoginView: View {
                                 LinearGradient(
                                     colors: [.white.opacity(0.15), .clear, .white.opacity(0.05)],
                                     startPoint: .topLeading,
-                                    endPoint: .bottomRight
+                                    endPoint: .bottomTrailing
                                 ),
                                 lineWidth: 1.5
                             )

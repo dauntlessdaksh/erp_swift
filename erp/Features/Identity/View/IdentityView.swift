@@ -23,7 +23,7 @@ struct IdentityView: View {
                     Text("STUDENT ID")
                         .font(.system(size: 11, weight: .bold, design: .rounded))
                         .foregroundColor(.white.opacity(0.45))
-                        .letterSpacing(1.5)
+                        .tracking(1.5)
                     
                     if let code = barcodeData {
                         VStack(spacing: 16) {
@@ -50,7 +50,7 @@ struct IdentityView: View {
                             Text(code)
                                 .font(.system(size: 14, weight: .medium, design: .monospaced))
                                 .foregroundColor(.white.opacity(0.65))
-                                .letterSpacing(2)
+                                .tracking(2)
                         }
                     } else {
                         ProgressView()
@@ -73,7 +73,7 @@ struct IdentityView: View {
                 Text("UpMark ERP")
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundColor(.white.opacity(0.25))
-                    .letterSpacing(2)
+                    .tracking(2)
                     .textCase(.uppercase)
                     .padding(.bottom, 120)
             }
