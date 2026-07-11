@@ -140,6 +140,7 @@ struct LoginView: View {
                     .shadow(color: Color.black.opacity(0.35), radius: 30, x: 0, y: 15)
                 }
             }
+            .scrollContentBackground(.hidden)
         }
         .onReceive(viewModel.$authState) { state in
             switch state {
