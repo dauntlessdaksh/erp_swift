@@ -3,84 +3,124 @@ import SwiftUI
 struct ProfileView: View {
     @StateObject private var viewModel = ProfileViewModel()
     let onLogout: () -> Void
-    
+    @Environment(\.colorScheme) var colorScheme
     @State private var showLogoutDialog = false
     
     var body: some View {
         ZStack {
-            VStack {
-                // Header
-                HStack {
-                    Text("Profile")
-                        .font(.system(size: 24, weight: .bold, design: .rounded))
-                        .foregroundColor(.white)
-                    Spacer()
-                    
-                    Button(action: {
-                        showLogoutDialog = true
-                    }) {
-                        Image(systemName: "rectangle.portrait.and.arrow.right")
-                            .font(.system(size: 18, weight: .bold))
-                            .foregroundColor(Color(red: 255/255, green: 107/255, blue: 107/255))
-                            .padding(10)
-                            .background(Color(red: 255/255, green: 107/255, blue: 107/255).opacity(0.1))
-                            .clipShape(Circle())
+            Color.appBackground
+                .ignoresSafeArea()
+            
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 24) {
+                    // Header
+                    HStack(spacing: 12) {
+                        Image(systemName: "person.circle.fill")
+                            .font(.system(size: 24))
+                            .foregroundColor(.appBlue)
+                        
+                        Text("Profile")
+                            .font(.system(size: 24, weight: .black, design: .rounded))
+                            .foregroundColor(.appTextPrimary)
+                        
+                        Spacer()
+                        
+                        Button(action: {
+                            showLogoutDialog = true
+                        }) {
+                            Image(systemName: "power")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(.appRed)
+                                .padding(10)
+                                .background(.ultraThinMaterial)
+                                .clipShape(Circle())
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.appTextPrimary.opacity(0.08), lineWidth: 1)
+                                )
+                        }
+                        .buttonStyle(TactileButtonStyle())
                     }
-                }
-                .padding(.horizontal, 24)
-                .padding(.top, 16)
-                
-                switch viewModel.state {
-                case .initial, .loading:
-                    Spacer()
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: Color(red: 46/255, green: 158/255, blue: 91/255)))
-                        .scaleEffect(1.5)
-                    Spacer()
+                    .padding(.horizontal, 24)
+                    .padding(.top, 16)
                     
-                case .error(let msg):
-                    Spacer()
-                    Text(msg)
-                        .font(.system(size: 14))
-                        .foregroundColor(.white.opacity(0.6))
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 40)
-                    Spacer()
-                    
-                case .loaded(let profile):
-                    ScrollView {
+                    switch viewModel.state {
+                    case .initial, .loading:
+                        Spacer(minLength: 100)
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: Color.appBlue))
+                            .scaleEffect(1.5)
+                        Spacer()
+                        
+                    case .error(let msg):
+                        Spacer(minLength: 100)
+                        VStack(spacing: 16) {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.system(size: 48))
+                                .foregroundColor(.appRed)
+                            Text(msg)
+                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                .foregroundColor(.appTextSecondary)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 40)
+                        }
+                        Spacer()
+                        
+                    case .loaded(let profile):
                         VStack(spacing: 20) {
-                            // Section 1: Academic & Personal Info
-                            ProfileSectionCard(title: "Academic Profile", iconName: "book.fill") {
+                            // Section 1: Student Info
+                            ProfileSectionCard(title: "Student Info", iconName: "person.text.rectangle.fill", accentColor: .appBlue) {
                                 InfoRowView(label: "Full Name", value: profile.fullName)
-                                InfoRowView(label: "Email", value: profile.collegeEmail)
+                                InfoRowView(label: "Date of Birth", value: profile.dob)
+                                InfoRowView(label: "Mobile No.", value: profile.contactNumber)
+                                InfoRowView(label: "Home Address", value: profile.address)
+                            }
+                            
+                            // Section 2: Academic Info
+                            ProfileSectionCard(title: "Academic Info", iconName: "graduationcap.fill", accentColor: .appBlue) {
                                 InfoRowView(label: "Roll Number", value: profile.rollNumber)
                                 InfoRowView(label: "Semester", value: "Semester \(profile.semester)")
                                 InfoRowView(label: "Section", value: profile.section)
-                                InfoRowView(label: "Date of Birth", value: profile.dob)
-                                InfoRowView(label: "Mobile No.", value: profile.contactNumber)
+                                InfoRowView(label: "College Email", value: profile.collegeEmail)
                             }
                             
-                            // Section 2: Family Info
-                            ProfileSectionCard(title: "Family Details", iconName: "person.2.fill") {
+                            // Section 3: Family Info
+                            ProfileSectionCard(title: "Family Details", iconName: "person.2.fill", accentColor: .appBlue) {
                                 InfoRowView(label: "Father's Name", value: profile.fatherName)
                                 InfoRowView(label: "Mother's Name", value: profile.motherName)
                                 InfoRowView(label: "Parent Mobile No.", value: profile.parentMobileNumber)
                             }
                             
-                            // Section 3: Address Info
-                            ProfileSectionCard(title: "Address", iconName: "mappin.and.ellipse") {
-                                InfoRowView(label: "Home Address", value: profile.address)
+                            // Glass Logout Button at the bottom
+                            Button(action: {
+                                showLogoutDialog = true
+                            }) {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "power")
+                                        .font(.system(size: 16, weight: .bold))
+                                    Text("Sign Out of Portal")
+                                        .font(.system(size: 15, weight: .bold, design: .rounded))
+                                }
+                                .foregroundColor(.appRed)
+                                .padding(.vertical, 14)
+                                .frame(maxWidth: .infinity)
+                                .background(.ultraThinMaterial)
+                                .cornerRadius(20)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .stroke(Color.appRed.opacity(0.15), lineWidth: 1.5)
+                                )
+                                .premiumCardShadow(colorScheme: colorScheme)
                             }
-                            
-                            Spacer()
-                                .frame(height: 120)
+                            .buttonStyle(TactileButtonStyle())
+                            .padding(.top, 10)
                         }
-                        .padding(.top, 10)
-                        .padding(.horizontal, 16)
+                        .padding(.horizontal, 24)
                     }
                 }
+                .padding(.bottom, 160) // Prevent overlap with custom tab bar
             }
+            .scrollContentBackground(.hidden)
         }
         .onAppear {
             Task {
@@ -99,43 +139,44 @@ struct ProfileView: View {
 }
 
 struct ProfileSectionCard<Content: View>: View {
+    @Environment(\.colorScheme) var colorScheme
     let title: String
     let iconName: String
+    let accentColor: Color
     let content: Content
     
-    init(title: String, iconName: String, @ViewBuilder content: () -> Content) {
+    init(title: String, iconName: String, accentColor: Color = .appBlue, @ViewBuilder content: () -> Content) {
         self.title = title
         self.iconName = iconName
+        self.accentColor = accentColor
         self.content = content()
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 14) {
             HStack(spacing: 8) {
                 Image(systemName: iconName)
-                    .foregroundColor(Color(red: 123/255, green: 111/255, blue: 240/255))
+                    .foregroundColor(accentColor)
                     .font(.system(size: 16, weight: .bold))
                 
                 Text(title)
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(.white)
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .foregroundColor(.appTextPrimary)
             }
             
             Divider()
-                .background(Color.white.opacity(0.12))
+                .background(Color.appSecondaryCard)
             
             VStack(alignment: .leading, spacing: 14) {
                 content
             }
             .padding(.top, 4)
         }
-        .padding(16)
-        .background(Color.white.opacity(0.04))
-        .cornerRadius(16)
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.white.opacity(0.08), lineWidth: 1.5)
-        )
+        .padding(20)
+        .background(Color.appCard)
+        .cornerRadius(28)
+        .innerHighlight(cornerRadius: 28, colorScheme: colorScheme)
+        .premiumCardShadow(colorScheme: colorScheme)
     }
 }
 
@@ -146,13 +187,13 @@ struct InfoRowView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(label.uppercased())
-                .font(.system(size: 9, weight: .bold))
-                .foregroundColor(.white.opacity(0.4))
+                .font(.system(size: 9, weight: .black, design: .rounded))
+                .foregroundColor(.appTextSecondary.opacity(0.6))
                 .tracking(1.2)
             
             Text(value.isEmpty ? "-" : value)
-                .font(.system(size: 14, weight: .medium))
-                .foregroundColor(.white)
+                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                .foregroundColor(.appTextPrimary)
                 .multilineTextAlignment(.leading)
         }
     }
