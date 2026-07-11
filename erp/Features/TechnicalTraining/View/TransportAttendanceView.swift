@@ -2,138 +2,171 @@ import SwiftUI
 
 struct TransportAttendanceView: View {
     @StateObject private var viewModel = TransportAttendanceViewModel()
+    @Environment(\.colorScheme) var colorScheme
     
     var body: some View {
         ZStack {
-            VStack {
-                // Header
-                HStack {
-                    Text("Technical Training")
-                        .font(.system(size: 24, weight: .bold, design: .rounded))
-                        .foregroundColor(.white)
-                    Spacer()
-                }
-                .padding(.horizontal, 24)
-                .padding(.top, 16)
-                
-                Spacer(minLength: 10)
-                
-                switch viewModel.state {
-                case .initial, .loading:
-                    Spacer()
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: Color(red: 46/255, green: 158/255, blue: 91/255)))
-                        .scaleEffect(1.5)
-                    Spacer()
-                    
-                case .error(let msg):
-                    Spacer()
-                    VStack(spacing: 12) {
-                        Image(systemName: "exclamationmark.triangle")
-                            .font(.system(size: 40))
-                            .foregroundColor(.red.opacity(0.8))
-                        Text(msg)
-                            .font(.system(size: 14))
-                            .foregroundColor(.white.opacity(0.6))
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, 40)
-                    }
-                    Spacer()
-                    
-                case .loaded(let list):
-                    if list.isEmpty {
+            Color.appBackground
+                .ignoresSafeArea()
+            
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 24) {
+                    // Header
+                    HStack(spacing: 12) {
+                        Image(systemName: "cpu.fill")
+                            .font(.system(size: 24))
+                            .foregroundColor(.appGreen)
+                        
+                        Text("Technical Training")
+                            .font(.system(size: 24, weight: .black, design: .rounded))
+                            .foregroundColor(.appTextPrimary)
+                        
                         Spacer()
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 16)
+                    
+                    switch viewModel.state {
+                    case .initial, .loading:
+                        Spacer(minLength: 100)
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: Color.appGreen))
+                            .scaleEffect(1.5)
+                        Spacer()
+                        
+                    case .error(let msg):
+                        Spacer(minLength: 100)
                         VStack(spacing: 16) {
-                            Image(systemName: "calendar.badge.exclamationmark")
-                                .font(.system(size: 54))
-                                .foregroundColor(.white.opacity(0.2))
-                            Text("No attendance found")
-                                .font(.system(size: 16))
-                                .foregroundColor(.white.opacity(0.4))
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .font(.system(size: 48))
+                                .foregroundColor(.appRed)
+                            Text(msg)
+                                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                                .foregroundColor(.appTextSecondary)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 40)
                         }
                         Spacer()
-                    } else {
-                        let total = list.count
-                        let present = list.filter { !$0.isInAbsent }.count
-                        let percent = total > 0 ? (Double(present) / Double(total) * 100.0) : 0.0
-                        let isGood = percent >= 80.0
                         
-                        ScrollView {
-                            VStack(spacing: 20) {
-                                // Summary Card
-                                VStack(spacing: 16) {
-                                    HStack {
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            Text(String(format: "%.1f%%", percent))
-                                                .font(.system(size: 36, weight: .black, design: .rounded))
-                                                .foregroundColor(isGood ? Color(red: 61/255, green: 170/255, blue: 112/255) : Color(red: 229/255, green: 57/255, blue: 53/255))
-                                            Text("TOTAL ATTENDANCE")
-                                                .font(.system(size: 10, weight: .bold))
-                                                .foregroundColor(.white.opacity(0.4))
-                                                .tracking(1)
-                                        }
-                                        Spacer()
-                                        
-                                        VStack(alignment: .trailing, spacing: 4) {
-                                            Text("\(present) / \(total)")
-                                                .font(.system(size: 18, weight: .bold))
-                                                .foregroundColor(.white)
-                                            Text(isGood ? "Good Attendance" : "Low Attendance")
-                                                .font(.system(size: 12, weight: .semibold))
-                                                .foregroundColor(isGood ? Color(red: 61/255, green: 170/255, blue: 112/255).opacity(0.8) : Color(red: 229/255, green: 57/255, blue: 53/255).opacity(0.8))
-                                        }
+                    case .loaded(let list):
+                        if list.isEmpty {
+                            Spacer(minLength: 100)
+                            VStack(spacing: 16) {
+                                Image(systemName: "calendar.badge.exclamationmark")
+                                    .font(.system(size: 64))
+                                    .foregroundColor(.appTextSecondary.opacity(0.3))
+                                Text("No training attendance found")
+                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                    .foregroundColor(.appTextSecondary)
+                            }
+                            Spacer()
+                        } else {
+                            let total = list.count
+                            let present = list.filter { !$0.isInAbsent }.count
+                            let percent = total > 0 ? (Double(present) / Double(total) * 100.0) : 0.0
+                            let isGood = percent >= 80.0
+                            let statusColor = isGood ? Color.appGreen : Color.appRed
+                            
+                            // Overall Progress Ring Card
+                            HStack(spacing: 24) {
+                                ProgressRingView(
+                                    progress: percent / 100.0,
+                                    text: String(format: "%.1f%%", percent),
+                                    ringColor: colorScheme == .light ? Color.appGreen : .white,
+                                    ringTrackColor: colorScheme == .light ? Color.appGreen.opacity(0.08) : Color.white.opacity(0.08),
+                                    textColor: colorScheme == .light ? Color.appTextPrimary : .white,
+                                    labelColor: colorScheme == .light ? Color.appTextSecondary : .white.opacity(0.7)
+                                )
+                                
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("Overall Attendance")
+                                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                                        .foregroundColor(colorScheme == .light ? Color.appTextPrimary : .white)
+                                    
+                                    Text("\(present) of \(total) training days")
+                                        .font(.system(size: 14, weight: .medium, design: .rounded))
+                                        .foregroundColor(colorScheme == .light ? Color.appTextSecondary : .white.opacity(0.8))
+                                    
+                                    Text(isGood ? "GOOD STANDING" : "ATTENTION REQUIRED")
+                                        .font(.system(size: 10, weight: .black, design: .rounded))
+                                        .foregroundColor(statusColor)
+                                        .padding(.vertical, 4)
+                                        .padding(.horizontal, 8)
+                                        .background(statusColor.opacity(0.12))
+                                        .cornerRadius(6)
+                                }
+                                
+                                Spacer()
+                            }
+                            .padding(24)
+                            .background(
+                                ZStack {
+                                    if colorScheme == .light {
+                                        LinearGradient(
+                                            colors: [Color.appGreen.opacity(0.16), Color.appTeal.opacity(0.10)],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    } else {
+                                        LinearGradient(
+                                            colors: [Color(red: 4/255, green: 65/255, blue: 45/255), Color(red: 1/255, green: 30/255, blue: 20/255)],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
                                     }
                                 }
-                                .padding(20)
-                                .background(Color.white.opacity(0.04))
-                                .cornerRadius(20)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.white.opacity(0.1), lineWidth: 1.5)
-                                )
-                                .padding(.horizontal, 16)
+                            )
+                            .cornerRadius(32)
+                            .innerHighlight(cornerRadius: 32, colorScheme: colorScheme)
+                            .premiumCardShadow(colorScheme: colorScheme)
+                            .padding(.horizontal, 24)
+                            
+                            // Timeline logs section
+                            VStack(alignment: .leading, spacing: 16) {
+                                Text("Training History Log")
+                                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                                    .foregroundColor(.appTextPrimary)
+                                    .padding(.horizontal, 24)
                                 
-                                // Logs List
-                                VStack(spacing: 10) {
+                                LazyVStack(spacing: 12) {
                                     ForEach(list) { entry in
-                                        HStack {
+                                        HStack(spacing: 16) {
+                                            Circle()
+                                                .fill(entry.isInAbsent ? Color.appRed : Color.appGreen)
+                                                .frame(width: 8, height: 8)
+                                                .shadow(color: (entry.isInAbsent ? Color.appRed : Color.appGreen).opacity(0.4), radius: 4)
+                                            
                                             VStack(alignment: .leading, spacing: 4) {
                                                 Text(formatDate(entry.attendanceDate))
-                                                    .font(.system(size: 15, weight: .semibold))
-                                                    .foregroundColor(.white)
-                                                if let remarks = entry.remarks, !remarks.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                                                    Text(remarks)
-                                                        .font(.system(size: 12))
-                                                        .foregroundColor(.white.opacity(0.4))
-                                                }
+                                                    .font(.system(size: 15, weight: .bold, design: .rounded))
+                                                    .foregroundColor(.appTextPrimary)
                                             }
                                             
                                             Spacer()
                                             
                                             Text(entry.isInAbsent ? "Absent" : "Present")
-                                                .font(.system(size: 13, weight: .bold))
-                                                .foregroundColor(entry.isInAbsent ? Color(red: 229/255, green: 57/255, blue: 53/255) : Color(red: 61/255, green: 170/255, blue: 112/255))
+                                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                                                .foregroundColor(entry.isInAbsent ? Color.appRed : Color.appGreen)
                                                 .padding(.vertical, 4)
                                                 .padding(.horizontal, 10)
-                                                .background(entry.isInAbsent ? Color(red: 229/255, green: 57/255, blue: 53/255).opacity(0.1) : Color(red: 61/255, green: 170/255, blue: 112/255).opacity(0.1))
-                                                .cornerRadius(12)
+                                                .background((entry.isInAbsent ? Color.appRed : Color.appGreen).opacity(0.08))
+                                                .cornerRadius(10)
                                         }
-                                        .padding(14)
-                                        .background(Color.white.opacity(0.03))
-                                        .cornerRadius(14)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 14)
-                                                .stroke(Color.white.opacity(0.06), lineWidth: 1)
-                                        )
+                                        .padding(18)
+                                        .background(Color.appCard)
+                                        .cornerRadius(24)
+                                        .innerHighlight(cornerRadius: 24, colorScheme: colorScheme)
+                                        .premiumCardShadow(colorScheme: colorScheme)
                                     }
                                 }
-                                .padding(.horizontal, 16)
-                                .padding(.bottom, 120)
+                                .padding(.horizontal, 24)
                             }
                         }
                     }
                 }
+                .padding(.bottom, 160) // Prevent overlap with custom tab bar
             }
+            .scrollContentBackground(.hidden)
         }
         .onAppear {
             Task {
