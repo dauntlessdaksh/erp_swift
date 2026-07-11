@@ -3,26 +3,28 @@ import SwiftUI
 struct SplashView: View {
     @StateObject private var viewModel = SplashViewModel()
     let onNavigate: (SplashNavigation) -> Void
+    @Environment(\.colorScheme) var colorScheme
+    
+    @State private var logoScale: CGFloat = 0.5
+    @State private var logoOpacity: Double = 0.0
+    @State private var logoRotation: Double = -45.0
+    @State private var textOpacity: Double = 0.0
+    @State private var textOffset: CGFloat = 20.0
+    @State private var pulseScale: CGFloat = 0.8
+    @State private var pulseOpacity: Double = 0.6
     
     var body: some View {
         ZStack {
-            // Premium background gradient
-            LinearGradient(
-                colors: [Color(red: 2/255, green: 6/255, blue: 23/255), Color(red: 15/255, green: 23/255, blue: 42/255)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
+            // Dynamic background following app theme selection
+            Color.appBackground.ignoresSafeArea()
             
-            // Subtle glowing circles
-            VStack {
-                Circle()
-                    .fill(Color(red: 99/255, green: 102/255, blue: 241/255).opacity(0.12))
-                    .frame(width: 400, height: 400)
-                    .blur(radius: 80)
-                    .offset(y: -100)
-                Spacer()
-            }
+            // Pulsing halo glow behind logo
+            Circle()
+                .fill(Color.appGreen.opacity(0.18))
+                .frame(width: 220, height: 220)
+                .scaleEffect(pulseScale)
+                .opacity(pulseOpacity)
+                .blur(radius: 20)
             
             VStack(spacing: 30) {
                 Spacer()
@@ -30,50 +32,74 @@ struct SplashView: View {
                 // Welcome Text
                 VStack(spacing: 12) {
                     Text("Welcome to")
-                        .font(.system(size: 24, weight: .medium, design: .rounded))
-                        .foregroundColor(.white.opacity(0.7))
+                        .font(.system(size: 20, weight: .semibold, design: .rounded))
+                        .foregroundColor(.appTextSecondary)
                     
-                    Text("UpMark !")
-                        .font(.system(size: 48, weight: .heavy, design: .rounded))
-                        .italic()
-                        .foregroundColor(.white)
-                        .shadow(color: .black.opacity(0.3), radius: 10, y: 5)
+                    Text("UpMark")
+                        .font(.system(size: 52, weight: .black, design: .rounded))
+                        .foregroundColor(.appTextPrimary)
+                        .shadow(color: Color.appTextPrimary.opacity(0.06), radius: 10, y: 5)
                 }
+                .opacity(textOpacity)
+                .offset(y: textOffset)
                 
                 Spacer()
                 
-                // Logo Icon
+                // Animated Logo Container
                 ZStack {
-                    RoundedRectangle(cornerRadius: 40)
-                        .fill(Color.white.opacity(0.04))
-                        .frame(width: 160, height: 160)
+                    RoundedRectangle(cornerRadius: 44)
+                        .fill(Color.appCard)
+                        .frame(width: 170, height: 170)
                         .overlay(
-                            RoundedRectangle(cornerRadius: 40)
-                                .stroke(Color.white.opacity(0.12), lineWidth: 1.5)
+                            RoundedRectangle(cornerRadius: 44)
+                                .stroke(Color.appTextPrimary.opacity(0.08), lineWidth: 1.5)
                         )
+                        .premiumCardShadow(colorScheme: colorScheme)
                     
                     Image(systemName: "checkmark.seal.fill")
-                        .font(.system(size: 80))
+                        .font(.system(size: 85))
                         .foregroundStyle(
                             LinearGradient(
-                                colors: [Color(red: 99/255, green: 102/255, blue: 241/255), Color(red: 79/255, green: 70/255, blue: 229/255)],
+                                colors: [Color.appGreen, Color(red: 52/255, green: 211/255, blue: 153/255)],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )
                         )
-                        .shadow(color: Color(red: 99/255, green: 102/255, blue: 241/255).opacity(0.5), radius: 15)
+                        .shadow(color: Color.appGreen.opacity(0.4), radius: 12)
                 }
+                .scaleEffect(logoScale)
+                .opacity(logoOpacity)
+                .rotationEffect(.degrees(logoRotation))
                 
                 Spacer()
                 
-                // Progress Loader
+                // Progress Indicator
                 ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle(tint: Color(red: 99/255, green: 102/255, blue: 241/255)))
+                    .progressViewStyle(CircularProgressViewStyle(tint: Color.appGreen))
                     .scaleEffect(1.5)
                     .padding(.bottom, 60)
             }
         }
         .onAppear {
+            // Spring animate logo scale & rotation
+            withAnimation(.spring(response: 0.65, dampingFraction: 0.55, blendDuration: 0).delay(0.1)) {
+                logoScale = 1.0
+                logoOpacity = 1.0
+                logoRotation = 0.0
+            }
+            
+            // Fade-in welcoming labels
+            withAnimation(.easeOut(duration: 0.8).delay(0.35)) {
+                textOpacity = 1.0
+                textOffset = 0.0
+            }
+            
+            // Continuous halo pulse
+            withAnimation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true)) {
+                pulseScale = 1.25
+                pulseOpacity = 0.04
+            }
+            
             Task {
                 await viewModel.checkSessionAndAutoLogin()
             }
