@@ -1,7 +1,11 @@
 import SwiftUI
 import CoreImage.CIFilterBuiltins
 
+/// Helper utility to generate verified student ID barcode graphics from user registration numbers.
 class BarcodeGenerator {
+    /// Generates a high-quality Code 128 barcode image for scanning at campus gates.
+    /// - Parameter string: The string identifier to encode.
+    /// - Returns: A scaled, crisp UIImage representation of the barcode, or nil if creation fails.
     static func generateBarcode(from string: String) -> UIImage? {
         guard let data = string.data(using: .ascii) else { return nil }
         let filter = CIFilter.code128BarcodeGenerator()
