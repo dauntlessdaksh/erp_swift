@@ -10,6 +10,11 @@ import SwiftUI
 @main
 struct erpApp: App {
     @State private var currentFlow: SplashNavigation = .loading
+    @AppStorage("themeMode") private var themeModeRaw = ThemeMode.dark.rawValue
+    
+    private var themeMode: ThemeMode {
+        ThemeMode(rawValue: themeModeRaw) ?? .dark
+    }
     
     var body: some Scene {
         WindowGroup {
@@ -37,6 +42,9 @@ struct erpApp: App {
                     }
                 }
             }
+            .preferredColorScheme(themeMode.colorScheme)
+            .id(themeModeRaw)
+            .animation(.easeInOut(duration: 0.35), value: themeModeRaw)
         }
     }
 }
