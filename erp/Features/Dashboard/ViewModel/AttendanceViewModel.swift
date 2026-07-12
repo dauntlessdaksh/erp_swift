@@ -15,6 +15,8 @@ class AttendanceViewModel: ObservableObject {
     @Published var selectedSemesterId: Int?
     @Published var attendanceEntries = [AttendanceEntry]()
     
+    @Published var studentName: String = "Student"
+    
     // Calculated Properties
     var subjectsGrouped: [String: [AttendanceEntry]] {
         return Dictionary(grouping: attendanceEntries, by: { $0.subjectName })
@@ -33,15 +35,37 @@ class AttendanceViewModel: ObservableObject {
         return (Double(presentLectures) / Double(totalLectures)) * 100.0
     }
     
+    var leavesAllowed: Int {
+        guard totalLectures > 0 else { return 0 }
+        let allowed = Int(floor(Double(presentLectures) / 0.75 - Double(totalLectures)))
+        return max(0, allowed)
+    }
+    
     private let repository = AttendanceRepository()
+    private let profileRepository = ProfileRepository()
+    
+    func loadStudentProfile() async {
+        do {
+            let profile = try await profileRepository.fetchUserProfile()
+            self.studentName = profile.firstName
+        } catch {
+            // Keep default
+        }
+    }
     
     func loadSemestersAndAttendance() async {
         self.state = .loading
         do {
             let semesters = try await repository.fetchSemesters()
             self.semesters = semesters
-            if let firstSem = semesters.first {
+            
+            let savedSemId = UserDefaults.standard.integer(forKey: "selectedSemesterId")
+            if savedSemId != 0, let savedSem = semesters.first(where: { $0.id == savedSemId }) {
+                self.selectedSemesterId = savedSem.id
+                await fetchAttendance(for: savedSem.userId)
+            } else if let firstSem = semesters.first {
                 self.selectedSemesterId = firstSem.id
+                UserDefaults.standard.set(firstSem.id, forKey: "selectedSemesterId")
                 await fetchAttendance(for: firstSem.userId)
             } else {
                 self.state = .loaded
@@ -54,6 +78,7 @@ class AttendanceViewModel: ObservableObject {
     func changeSemester(semesterId: Int) async {
         guard let sem = semesters.first(where: { $0.id == semesterId }) else { return }
         self.selectedSemesterId = semesterId
+        UserDefaults.standard.set(semesterId, forKey: "selectedSemesterId")
         self.state = .loading
         await fetchAttendance(for: sem.userId)
     }
