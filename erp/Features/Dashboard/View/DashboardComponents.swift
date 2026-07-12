@@ -108,27 +108,60 @@ struct StatTile: View {
     }
 }
 
-// AttendanceTimeline: Horizontal status circles for single/multiple classes per day
+// AttendanceTimeline: Premium vertical timeline showing class history
 struct AttendanceTimeline: View {
     let groupedByDate: [(date: String, status: String)]
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            ForEach(groupedByDate, id: \.date) { item in
-                HStack(spacing: 12) {
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(Array(groupedByDate.enumerated()), id: \.element.date) { index, item in
+                HStack(spacing: 0) {
+                    // Vertical Timeline Connector and Node Dot
+                    VStack(spacing: 0) {
+                        // Top line
+                        if index > 0 {
+                            Rectangle()
+                                .fill(Color.divider)
+                                .frame(width: 1.5, height: 12)
+                        } else {
+                            Spacer()
+                                .frame(height: 12)
+                        }
+                        
+                        // Dot Node
+                        Circle()
+                            .fill(item.status.contains("A") ? Color.appRed : Color.appGreen)
+                            .frame(width: 8, height: 8)
+                            .shadow(color: (item.status.contains("A") ? Color.appRed : Color.appGreen).opacity(0.3), radius: 3)
+                        
+                        // Bottom line
+                        if index < groupedByDate.count - 1 {
+                            Rectangle()
+                                .fill(Color.divider)
+                                .frame(width: 1.5, height: 24)
+                        } else {
+                            Spacer()
+                                .frame(height: 12)
+                        }
+                    }
+                    .frame(width: 24)
+                    
+                    // Date Label
                     Text(item.date)
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
                         .foregroundColor(.appTextPrimary)
+                        .padding(.leading, 8)
                     
                     Spacer()
                     
-                    HStack(spacing: 6) {
+                    // Class Status Circles
+                    HStack(spacing: 8) {
                         ForEach(Array(item.status.enumerated()), id: \.offset) { _, char in
                             let isAbsent = char == "A"
                             let color = isAbsent ? Color.appRed : Color.appGreen
                             
                             Text(String(char))
-                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                                .font(.system(size: 12, weight: .black, design: .rounded))
                                 .foregroundColor(color)
                                 .frame(width: 28, height: 28)
                                 .background(color.opacity(0.08))
@@ -140,6 +173,7 @@ struct AttendanceTimeline: View {
                         }
                     }
                 }
+                .frame(height: 44)
                 .transition(.opacity.combined(with: .slide))
             }
         }
