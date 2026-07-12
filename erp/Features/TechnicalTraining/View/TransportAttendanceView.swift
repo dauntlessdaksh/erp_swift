@@ -1,5 +1,13 @@
+//
+//  TransportAttendanceView.swift
+//  erp
+//
+//  Created by rachit daksh on 11/07/26.
+//
+
 import SwiftUI
 
+/// A view displaying the logs and analytics for student technical training programs.
 struct TransportAttendanceView: View {
     @StateObject private var viewModel = TransportAttendanceViewModel()
     @Environment(\.colorScheme) var colorScheme
