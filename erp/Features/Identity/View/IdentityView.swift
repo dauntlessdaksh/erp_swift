@@ -147,7 +147,7 @@ struct IdentityView: View {
                     
                     Spacer(minLength: 40)
                     
-                    // Card instruction text
+                    // Card instruction text with premium capsule styling
                     HStack(spacing: 8) {
                         Image(systemName: "info.circle.fill")
                             .foregroundColor(.appOrange)
@@ -155,6 +155,10 @@ struct IdentityView: View {
                             .font(.system(size: 12, weight: .semibold, design: .rounded))
                             .foregroundColor(.appTextSecondary)
                     }
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 16)
+                    .background(Color.appSecondaryCard.opacity(0.4))
+                    .cornerRadius(12)
                     .padding(.horizontal, 32)
                     .multilineTextAlignment(.center)
                     
