@@ -69,7 +69,7 @@ struct MainShellView: View {
                 }
                 .padding(.vertical, 12)
                 .padding(.horizontal, 20)
-                .background(colorScheme == .light ? Color.white.opacity(0.85) : Color.cardBackground.opacity(0.85))
+                .background(Color.currentTheme == .light ? Color.white.opacity(0.85) : Color.cardBackground.opacity(0.85))
                 .background(.ultraThinMaterial)
                 .cornerRadius(32)
                 .overlay(
@@ -97,7 +97,7 @@ struct TabBarItem: View {
                 .font(.system(size: 20))
                 .foregroundColor(isSelected ? Color.accentGreen : Color.secondaryText)
                 .padding(12)
-                .background(isSelected ? (colorScheme == .light ? Color.secondaryCard : Color.cardBackground.opacity(0.5)) : Color.clear)
+                .background(isSelected ? (Color.currentTheme == .light ? Color.secondaryCard : Color.cardBackground.opacity(0.5)) : Color.clear)
                 .cornerRadius(16)
                 .scaleEffect(isSelected ? 1.05 : 1.0)
         }
