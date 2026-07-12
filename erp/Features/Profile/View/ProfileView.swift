@@ -1,5 +1,13 @@
+//
+//  ProfileView.swift
+//  erp
+//
+//  Created by rachit daksh on 11/07/26.
+//
+
 import SwiftUI
 
+/// A view showcasing the user's detailed academic profile and settings.
 struct ProfileView: View {
     @StateObject private var viewModel = ProfileViewModel()
     let onLogout: () -> Void
