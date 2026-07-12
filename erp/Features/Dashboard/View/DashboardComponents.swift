@@ -108,50 +108,37 @@ struct StatTile: View {
     }
 }
 
-// AttendanceTimeline: Vertical dot timeline with Apple-like color scheme
+// AttendanceTimeline: Horizontal status circles for single/multiple classes per day
 struct AttendanceTimeline: View {
     let groupedByDate: [(date: String, status: String)]
-    
-    private func dotColor(for status: String) -> Color {
-        switch status {
-        case "A": return Color.appRed
-        case "H": return Color.appOrange
-        case "L": return Color.appBlue
-        default: return Color.appGreen
-        }
-    }
-    
-    private func statusLabel(for status: String) -> String {
-        switch status {
-        case "A": return "Absent"
-        case "H": return "Holiday"
-        case "L": return "Leave"
-        default: return "Present"
-        }
-    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             ForEach(groupedByDate, id: \.date) { item in
                 HStack(spacing: 12) {
-                    Circle()
-                        .fill(dotColor(for: item.status))
-                        .frame(width: 8, height: 8)
-                        .shadow(color: dotColor(for: item.status).opacity(0.4), radius: 4)
-                    
                     Text(item.date)
-                        .font(.system(size: 13, weight: .medium, design: .rounded))
-                        .foregroundColor(.appTextSecondary)
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .foregroundColor(.appTextPrimary)
                     
                     Spacer()
                     
-                    Text(statusLabel(for: item.status))
-                        .font(.system(size: 12, weight: .bold, design: .rounded))
-                        .foregroundColor(dotColor(for: item.status))
-                        .padding(.vertical, 4)
-                        .padding(.horizontal, 10)
-                        .background(dotColor(for: item.status).opacity(0.08))
-                        .cornerRadius(10)
+                    HStack(spacing: 6) {
+                        ForEach(Array(item.status.enumerated()), id: \.offset) { _, char in
+                            let isAbsent = char == "A"
+                            let color = isAbsent ? Color.appRed : Color.appGreen
+                            
+                            Text(String(char))
+                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                                .foregroundColor(color)
+                                .frame(width: 28, height: 28)
+                                .background(color.opacity(0.08))
+                                .clipShape(Circle())
+                                .overlay(
+                                    Circle()
+                                        .stroke(color.opacity(0.35), lineWidth: 1)
+                                )
+                        }
+                    }
                 }
                 .transition(.opacity.combined(with: .slide))
             }
