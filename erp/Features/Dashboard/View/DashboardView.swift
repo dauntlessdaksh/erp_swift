@@ -14,7 +14,7 @@ struct DashboardView: View {
     }
     
     private var heroGradient: LinearGradient {
-        if colorScheme == .light {
+        if Color.currentTheme == .light {
             return LinearGradient(
                 colors: [Color.appGreen.opacity(0.16), Color.appTeal.opacity(0.10)],
                 startPoint: .topLeading,
@@ -75,22 +75,22 @@ struct DashboardView: View {
                         ProgressRingView(
                             progress: viewModel.overallPercentage / 100.0,
                             text: String(format: "%.1f%%", viewModel.overallPercentage),
-                            ringColor: colorScheme == .light ? Color.appGreen : .white,
-                            ringTrackColor: colorScheme == .light ? Color.appGreen.opacity(0.08) : Color.white.opacity(0.08),
-                            textColor: colorScheme == .light ? Color.appTextPrimary : .white,
-                            labelColor: colorScheme == .light ? Color.appTextSecondary : .white.opacity(0.7)
+                            ringColor: Color.currentTheme == .light ? Color.appGreen : .white,
+                            ringTrackColor: Color.currentTheme == .light ? Color.appGreen.opacity(0.08) : Color.white.opacity(0.08),
+                            textColor: Color.currentTheme == .light ? Color.appTextPrimary : .white,
+                            labelColor: Color.currentTheme == .light ? Color.appTextSecondary : .white.opacity(0.7)
                         )
                         
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Overall Attendance")
                                 .font(.system(size: 18, weight: .bold, design: .rounded))
-                                .foregroundColor(colorScheme == .light ? Color.appTextPrimary : .white)
+                                .foregroundColor(Color.currentTheme == .light ? Color.appTextPrimary : .white)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.6)
                             
                             Text("\(viewModel.presentLectures) of \(viewModel.totalLectures) classes")
                                 .font(.system(size: 14, weight: .medium, design: .rounded))
-                                .foregroundColor(colorScheme == .light ? Color.appTextSecondary : .white.opacity(0.8))
+                                .foregroundColor(Color.currentTheme == .light ? Color.appTextSecondary : .white.opacity(0.8))
                             
                             let statusText = viewModel.overallPercentage >= 75.0 ? "On Track" : "Action Needed"
                             let statusColor = viewModel.overallPercentage >= 75.0 ? Color.appGreen : Color.appRed
